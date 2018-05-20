@@ -1,8 +1,8 @@
 #include <cstdlib>
 #include "Matrix.hpp"
 
-#ifndef ANPI_LU_HPP
-#define ANPI_LU_HPP
+#ifndef ANPI_LAPACK_HPP
+#define ANPI_LAPACK_HPP
 
 namespace anpi
 {
