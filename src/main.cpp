@@ -10,9 +10,14 @@
 
 #include <cstdlib>
 #include "RandomSymmetricSqr.hpp"
+#include "Jacobi.hpp"
 int main(int ac, char *av[])
 {
-  anpi::Matrix<double> M;
-  M = anpi::randomSymmetricSqr<double>(3);
+  anpi::Matrix<double> A,E;
+  A = {{1,0,2},{0,2,1},{2,1,1}};
+  std::vector<double> val;
+  anpi::jacobi(A, val, E);
+
+ 
   return 0;
 }
