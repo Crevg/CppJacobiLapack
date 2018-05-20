@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include "Matrix.hpp"
 #include <cmath>
+#include <limits>
 
 #ifndef ANPI_JACOBI_HPP
 #define ANPI_JACOBI_HPP
@@ -18,9 +19,20 @@ void printM(const anpi::Matrix<T> &A){
         std::cout << std::endl;
     }
 }
-
+bool notInV(size_t row, size_t col, const std::vector<size_t> &iVec, const std::vector<size_t> &jVec){
+    size_t n = iVec.size();
+    for (size_t i = 0; i<n; ++i){
+        if (iVec[i] == row && jVec[i] == col){
+            return false;
+        }else if (jVec[i] == row && iVec[i] == col){
+            return false;
+        }
+    }
+    return true;
+}
 template<typename T>
-std::vector<size_t> getMax(const anpi::Matrix<T>&A){
+void getMax(const anpi::Matrix<T>&A, std::vector<size_t>& rows, 
+                            std::vector<size_t> &cols){
     size_t maxI = 0;
     size_t maxJ= 1;
     size_t N = A.rows();
@@ -32,62 +44,93 @@ std::vector<size_t> getMax(const anpi::Matrix<T>&A){
     for (size_t i = 0; i < N; ++i){
         for (size_t j = 0; j < N; ++j){
             if (i != j){
-                if (abs(A(i,j)) > abs(A(maxI, maxJ))){
+                /*std::cout << "i,j: " << abs(A(i,j)) <<
+                " iMax, jMax curr: "  << abs(A(maxI, maxJ)) <<
+                " comparison " << (abs(A(i,j)) > abs(A(maxI, maxJ))) <<
+                " notInV? " << notInV(maxI, maxJ, rows, cols) << std::endl;
+                */
+                if (abs(A(i,j)) > abs(A(maxI, maxJ)) && notInV(i, j, rows, cols)){
                     maxI = i;
                     maxJ = j;
                 }
             }
         }
     }
-    std::vector<size_t> v;
-    v.push_back(maxI);
-    v.push_back(maxJ);
-    return v; 
+    rows.push_back(maxI);
+    cols.push_back(maxJ);
 }
 
 template<typename T>
 void jacobi(const anpi::Matrix<T>& A, std::vector<T> &val, anpi::Matrix<T> &E){
     T t ,ttemp , tau, c, s;
-    std::vector<size_t> max = anpi::getMax(A);
-    size_t row = max[0];
-    size_t col = max[1];
-    std::cout << "Posicion a cambiar: (" << row << ", " << col <<
-        ") y (" << col << ", " << row << ")\n";
-    if (A[row][col] == 0){
-        std::cout << "c'est finit" << std::endl;
-        return;
-    }
-    tau = (A[col][col] - A[row][row])/(2*A[row][col]);
-    t = -tau - sqrt(1+ tau*tau);
-    ttemp = -tau + sqrt(1+ tau*tau);
-    if (abs(ttemp) < abs(t)){
-        t = ttemp;
-    }
-    c = 1/ sqrt(1+t*t);
-    s = c * t;
-    std::cout << "Metadatos: " << std::endl;
-    std::cout << "T: " << t << "\ttau: " << tau <<
-        "\tc: " << c << "\ts: " << s << "\t(Ttemp: " << ttemp << ")\n"; 
-    size_t N = A.rows();
-    anpi::Matrix<T> Pi = anpi::Matrix<T>(N,N,0.0);
-    anpi::Matrix<T> PiT = anpi::Matrix<T>(N,N,0.0);
-    for (int i = 0; i < N; ++i){
-        Pi(i,i) = PiT(i,i) = 1;
-    }
-    Pi(row, row) = Pi(col, col) = c;
-    PiT(row, row) = PiT(col, col) = c;
-    Pi(row, col) = PiT(col, row) = s;
-    Pi(col, row) = PiT(row, col) = -s;
+    std::vector<size_t> rows, cols;
+    size_t row, col, N, vLen, sweeps;
+    T S= 1;
+    N = A.rows();
+    E = A;
+    size_t iterator = N*(N-1)/2;
+    T eps = sqrt(std::numeric_limits<T>::epsilon());
+    sweeps = 1;
+    while(S > eps){
+        
+        /*calcula posiciones a cambiar */
+        anpi::getMax(E, rows, cols);
+        vLen = rows.size();
+        row = rows[vLen-1]; //last element
+        col = cols[vLen-1]; //last element
+        std::cout << "Posicion a cambiar: (" << row << ", " << col <<
+            ") y (" << col << ", " << row << ")\n";
 
-    std::cout << "Matrices P: " << std::endl;
-    std::cout << "Pi: " << std::endl;
-    printM(Pi);
-    std::cout << "PiT: " << std::endl;
-    printM(PiT);
+        /*calcula los parametros */
+        tau = (E[col][col] - E[row][row])/(2*E[row][col]);
+        t = -tau - sqrt(1+ tau*tau);
+        ttemp = -tau + sqrt(1+ tau*tau);
+        if (abs(ttemp) < abs(t)){
+            t = ttemp;
+        }
+        c = 1/ sqrt(1+t*t);
+        s = c * t;
 
-    E = PiT*A*Pi;
-    std::cout << "E: " << std::endl;
+        /* crear y llena la matriz Pi y su transpuesta */ 
+
+        anpi::Matrix<T> Pi = anpi::Matrix<T>(N,N,0.0);
+        anpi::Matrix<T> PiT = anpi::Matrix<T>(N,N,0.0);
+
+        for (size_t j = 0; j < N; ++j){
+            Pi(j,j) = PiT(j,j) = 1;
+        }
+        Pi(row, row) = Pi(col, col) = c;
+        PiT(row, row) = PiT(col, col) = c;
+        Pi(row, col) = PiT(col, row) = s;
+        Pi(col, row) = PiT(row, col) = -s;
+
+        /* crear la matriz de la siguiente iteración */ 
+        E = PiT*E*Pi;
+        
+        /*criterio de convergencia */ 
+        S = 0;
+        for (size_t l = 0; l < N; ++l){
+            for (size_t k = 0; k < N; ++k){
+                if (l != k){
+                    S += E[l][k]*E[l][k];
+                }
+            }
+        }
+        S -= 2*E[row][col]*E[row][col];
+        S = abs(S);
+        std::cout << "S' igual: " << S << std::endl; 
+        
+        /*check if sweeps is finished */
+        if (vLen == N*(N-1)/2){
+            sweeps+=1;
+            rows.clear();
+            cols.clear();
+        }
+    }
+
     printM(E);
+
+
 }
 
 }//anpi
