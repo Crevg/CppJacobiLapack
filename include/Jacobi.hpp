@@ -10,6 +10,15 @@ namespace anpi
 {
 
 template <typename T>
+void printV(const std::vector<T> &v){
+    size_t n= v.size();
+    for (int i = 0; i<n; ++i){
+        std::cout << v[i] << "\t";
+    }
+    std::cout << "\n";
+}
+
+template <typename T>
 void printM(const anpi::Matrix<T> &A){
     size_t n = A.rows();
     for (size_t i = 0; i < n; ++i){
@@ -62,27 +71,29 @@ void getMax(const anpi::Matrix<T>&A, std::vector<size_t>& rows,
 
 template<typename T>
 void jacobi(const anpi::Matrix<T>& A, std::vector<T> &val, anpi::Matrix<T> &E){
-    T t ,ttemp , tau, c, s;
+    /* declara las variables necesarias */
+    T t ,ttemp , tau, c, s, S, eps;
     std::vector<size_t> rows, cols;
     size_t row, col, N, vLen, sweeps;
-    T S= 1;
+    anpi::Matrix<T> Ap;
+    S = 1;
     N = A.rows();
-    E = A;
-    size_t iterator = N*(N-1)/2;
-    T eps = sqrt(std::numeric_limits<T>::epsilon());
+    Ap = A;
+    /* inicializa E con la matriz identidad NxN*/
+    E = anpi::Matrix<T>(N,N,0.0);
+    for (size_t i = 0 ; i < N; ++i){
+        E(i,i) = 1.0;
+    }
+
+    eps = sqrt(std::numeric_limits<T>::epsilon());
     sweeps = 1;
     while(S > eps){
-        
         /*calcula posiciones a cambiar */
-        anpi::getMax(E, rows, cols);
+        anpi::getMax(Ap, rows, cols);
         vLen = rows.size();
         row = rows[vLen-1]; //last element
         col = cols[vLen-1]; //last element
-        std::cout << "Posicion a cambiar: (" << row << ", " << col <<
-            ") y (" << col << ", " << row << ")\n";
-
-        /*calcula los parametros */
-        tau = (E[col][col] - E[row][row])/(2*E[row][col]);
+        tau = (Ap[col][col] - Ap[row][row])/(2*Ap[row][col]);
         t = -tau - sqrt(1+ tau*tau);
         ttemp = -tau + sqrt(1+ tau*tau);
         if (abs(ttemp) < abs(t)){
@@ -105,20 +116,19 @@ void jacobi(const anpi::Matrix<T>& A, std::vector<T> &val, anpi::Matrix<T> &E){
         Pi(col, row) = PiT(row, col) = -s;
 
         /* crear la matriz de la siguiente iteración */ 
-        E = PiT*E*Pi;
+        Ap = PiT*Ap*Pi;
         
         /*criterio de convergencia */ 
         S = 0;
         for (size_t l = 0; l < N; ++l){
             for (size_t k = 0; k < N; ++k){
                 if (l != k){
-                    S += E[l][k]*E[l][k];
+                    S += Ap[l][k]*Ap[l][k];
                 }
             }
         }
-        S -= 2*E[row][col]*E[row][col];
+        S -= 2*Ap[row][col]*Ap[row][col];
         S = abs(S);
-        std::cout << "S' igual: " << S << std::endl; 
         
         /*check if sweeps is finished */
         if (vLen == N*(N-1)/2){
@@ -126,11 +136,11 @@ void jacobi(const anpi::Matrix<T>& A, std::vector<T> &val, anpi::Matrix<T> &E){
             rows.clear();
             cols.clear();
         }
+        E = E*Pi;
     }
-
-    printM(E);
-
-
+    for (size_t i = 0; i < N; ++i){
+        val.push_back(Ap(i,i));
+    }
 }
 
 }//anpi
