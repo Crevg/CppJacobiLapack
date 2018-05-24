@@ -43,6 +43,7 @@ void eig(const anpi::Matrix<T>& A,
     //meter la matriz a en un array para lapack
     float a[LDA*N];
     int cont = 0;
+    float w[N];
 
     int col = A.cols();
     for(int i = 0; i < col; ++i){
@@ -51,33 +52,41 @@ void eig(const anpi::Matrix<T>& A,
             ++cont;
         }
     }
-        /* Local arrays */
-        float w[N];
 
-        /* Executable statements */
+        //imprimir
         printf( " SSYEV Example Program Results\n" );
-        /* Query and allocate the optimal workspace */
+        //guardar en memoria
         lwork = -1;
         ssyev_( "Vectors", "Upper", &n, a, &lda, w, &wkopt, &lwork, &info );
         lwork = (int)wkopt;
         work = (float*)malloc( lwork*sizeof(float) );
-        /* Solve eigenproblem */
+        //resolver
         ssyev_( "Vectors", "Upper", &n, a, &lda, w, work, &lwork, &info );
-        /* Check for convergence */
+        //revisar convergencia
         if( info > 0 ) {
                 printf( "The algorithm failed to compute eigenvalues.\n" );
                 exit( 1 );
         }
-        /* Print eigenvalues */
+        //Imprimir eigenvalores
         print_matrix( "Eigenvalues", 1, n, w, 1 );
-        /* Print eigenvectors */
+        //imprimir aigenvectores
         print_matrix( "Eigenvectors (stored columnwise)", n, n, a, lda );
-        /* Free workspace */
+        //liberar memoria
+
+    //convertir de nuevo el array de lapack a una matriz de anpi
+    int col = A.cols();
+    for(int i = 0; i < col; ++i){
+        for(int j = 0; j < col; ++j){
+            E[i][j] = a[cont];
+            ++cont;
+        }
+    }
+    
         free( (void*)work );
         exit( 0 );
-} /* End of SSYEV Example */
+}
 
-/* Auxiliary routine: printing a matrix */
+// funcion para imprimir
 void print_matrix( char* desc, int m, int n, float* a, int lda ) {
         int i, j;
         printf( "\n %s\n", desc );
