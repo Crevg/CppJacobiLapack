@@ -9,6 +9,7 @@
  */
 
 #include <cstdlib>
+#include "LapackFunctions.hpp"
 #include "RandomSymmetricSqr.hpp"
 #include "Jacobi.hpp"
 int main(int ac, char *av[])
@@ -23,6 +24,8 @@ int main(int ac, char *av[])
   };*/
   std::vector<double> val;
   anpi::jacobi(A, val, E);
+  anpi::eig(A, val, E);
+
   std::cout << "Eigenvectors: " << std::endl;
   printM(E);
   std::cout << "Eigenvalues: " << std::endl;

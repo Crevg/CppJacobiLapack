@@ -1,3 +1,6 @@
+find_package(LAPACK)
+include_directories (${CMAKE_SOURCE_DIR}/include ${LAPACK})
+
 find_package (Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS})
 
