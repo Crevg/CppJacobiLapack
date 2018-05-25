@@ -1,6 +1,9 @@
 find_package(LAPACK)
 include_directories (${CMAKE_SOURCE_DIR}/include ${LAPACK})
 
+find_package(LAPACKE)
+include_directories (${CMAKE_SOURCE_DIR}/include ${LAPACKE})
+
 find_package (Boost COMPONENTS system filesystem REQUIRED)
 include_directories (${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS})
 
@@ -44,4 +47,4 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/AnpiConfig.hpp.in ${CMAKE_SOURCE_DIR}/i
 
 add_library(anpi STATIC ${SRCS} ${HEADERS})
 add_executable(tarea6 main.cpp)
-target_link_libraries(tarea6 anpi python2.7)
+target_link_libraries(tarea6 anpi python2.7 lapack blas)

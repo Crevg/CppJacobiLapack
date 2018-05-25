@@ -8,6 +8,23 @@
 
 namespace anpi
 {
+template <typename T>
+std::vector<T> multiByNum (const std::vector<T> v, T num){
+    std::vector <T> res;
+    for (size_t i = 0; i < v.size(); ++i){
+        res.push_back(num * v[i]);
+    }
+    return res;
+}
+
+template <typename T>
+std::vector<T> getCol (const anpi::Matrix<T> &M, size_t n){
+    std::vector<T> v;
+    for (size_t i = 0; i < M.rows(); ++i){
+        v.push_back(M[i][n]);
+    }
+    return v;
+}
 
 template <typename T>
 void printV(const std::vector<T> &v){
@@ -53,11 +70,6 @@ void getMax(const anpi::Matrix<T>&A, std::vector<size_t>& rows,
     for (size_t i = 0; i < N; ++i){
         for (size_t j = 0; j < N; ++j){
             if (i != j){
-                /*std::cout << "i,j: " << abs(A(i,j)) <<
-                " iMax, jMax curr: "  << abs(A(maxI, maxJ)) <<
-                " comparison " << (abs(A(i,j)) > abs(A(maxI, maxJ))) <<
-                " notInV? " << notInV(maxI, maxJ, rows, cols) << std::endl;
-                */
                 if (abs(A(i,j)) > abs(A(maxI, maxJ)) && notInV(i, j, rows, cols)){
                     maxI = i;
                     maxJ = j;
@@ -77,6 +89,7 @@ void jacobi(const anpi::Matrix<T>& A, std::vector<T> &val, anpi::Matrix<T> &E){
     size_t row, col, N, vLen, sweeps;
     anpi::Matrix<T> Ap;
     S = 1;
+    T Sprev = 0;
     N = A.rows();
     Ap = A;
     /* inicializa E con la matriz identidad NxN*/
@@ -87,7 +100,9 @@ void jacobi(const anpi::Matrix<T>& A, std::vector<T> &val, anpi::Matrix<T> &E){
 
     eps = sqrt(std::numeric_limits<T>::epsilon());
     sweeps = 1;
-    while(S > eps){
+    int n = 0;
+    while(S > eps){    
+          
         /*calcula posiciones a cambiar */
         anpi::getMax(Ap, rows, cols);
         vLen = rows.size();
@@ -123,24 +138,39 @@ void jacobi(const anpi::Matrix<T>& A, std::vector<T> &val, anpi::Matrix<T> &E){
         for (size_t l = 0; l < N; ++l){
             for (size_t k = 0; k < N; ++k){
                 if (l != k){
-                    S += Ap[l][k]*Ap[l][k];
+                    S += abs(Ap[l][k]*Ap[l][k]);
                 }
             }
         }
-        S -= 2*Ap[row][col]*Ap[row][col];
+        S -= 2*abs(Ap[row][col]*Ap[row][col]);
         S = abs(S);
         
+        E = E*Pi; //guarda los eigenvectores en las columnas
+
         /*check if sweeps is finished */
         if (vLen == N*(N-1)/2){
             sweeps+=1;
             rows.clear();
             cols.clear();
-        }
-        E = E*Pi;
+
+            /* si 50 barridos seguidos mantiene el mismo 
+             * criterio de convergencia entonces termine
+             */
+            if (S == Sprev){
+                n++;
+                if (n == 50){
+                    break;
+                }
+            }else{
+                n = 0;
+            }
+            Sprev = S;
+        }    
     }
     for (size_t i = 0; i < N; ++i){
         val.push_back(Ap(i,i));
     }
+    std::cout << "Sweeps: " << sweeps << std::endl;
 }
 
 }//anpi
