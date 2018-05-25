@@ -25,8 +25,6 @@ extern "C"
                 float* w, float* work, int* lwork, int* info );
 }
 
-extern void print_matrix( char* desc, int m, int n, float* a, int lda );
-
 
 template<typename T>
 void eig(const anpi::Matrix<T>& A,
@@ -34,7 +32,7 @@ void eig(const anpi::Matrix<T>& A,
     anpi::Matrix<T>& E){
 
     /* Locals */
-    int N = 10;
+    int N = A.cols();
     int LDA = N;
     int n = N, lda = LDA, info, lwork;
     float wkopt;
@@ -42,19 +40,14 @@ void eig(const anpi::Matrix<T>& A,
 
     //meter la matriz a en un array para lapack
     float a[LDA*N];
-    int cont = 0;
     float w[N];
 
-    int col = A.cols();
-    for(int i = 0; i < col; ++i){
-        for(int j = 0; j < col; ++j){
-            a[cont] = A[i][j];
-            ++cont;
+    for(int i = 0; i < N; ++i){
+        for(int j = 0; j < N; ++j){
+            a[i+j*lda] = A[i][j];
         }
     }
 
-        //imprimir
-        printf( " SSYEV Example Program Results\n" );
         //guardar en memoria
         lwork = -1;
         ssyev_( "Vectors", "Upper", &n, a, &lda, w, &wkopt, &lwork, &info );
@@ -67,35 +60,21 @@ void eig(const anpi::Matrix<T>& A,
                 printf( "The algorithm failed to compute eigenvalues.\n" );
                 exit( 1 );
         }
-        //Imprimir eigenvalores
-        print_matrix( "Eigenvalues", 1, n, w, 1 );
-        //imprimir aigenvectores
-        print_matrix( "Eigenvectors (stored columnwise)", n, n, a, lda );
-        //liberar memoria
+        
+    //convertir array de lapack a vector de anpi
+    for(int i = 0; i < N; ++i){
+        val[i] = w[i];
+    }
 
     //convertir de nuevo el array de lapack a una matriz de anpi
-    int col = A.cols();
-    for(int i = 0; i < col; ++i){
-        for(int j = 0; j < col; ++j){
-            E[i][j] = a[cont];
-            ++cont;
+    for(int i = 0; i < N; ++i){
+        for(int j = 0; j < N; ++j){
+            E[i][j] = a[i+j*lda];
         }
     }
-    
+        //liberar memoria
         free( (void*)work );
-        exit( 0 );
-}
-
-// funcion para imprimir
-void print_matrix( char* desc, int m, int n, float* a, int lda ) {
-        int i, j;
-        printf( "\n %s\n", desc );
-        for( i = 0; i < m; i++ ) {
-                for( j = 0; j < n; j++ ) printf( " %6.2f", a[i+j*lda] );
-                printf( "\n" );
-        }
-
-    
+        //exit( 0 );
 }
 
 
