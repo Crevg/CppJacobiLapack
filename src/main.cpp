@@ -39,7 +39,7 @@ int main(int ac, char *av[])
   //ejecución de métodos
   unsigned t0J, t1J;
   t0J=clock();
-  //anpi::jacobi(A, valJ, EJ);
+  anpi::jacobi(A, valJ, EJ);
   t1J=clock();
   double time = (double(t1J-t0J)/CLOCKS_PER_SEC);
   std::cout << "Tiempo Jacobi: " << time << "\n" << std::endl;
