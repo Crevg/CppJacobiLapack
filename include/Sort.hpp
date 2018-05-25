@@ -25,7 +25,7 @@ void sort(std::vector<T>&  val, anpi::Matrix<T>& E){
  
        // Last i elements are already in place   
        for (j = 0; j < int(val.size())-i-1; j++) 
-           if (val[j] < val[j+1]){
+           if (abs(val[j]) < abs(val[j+1])){
                 T temp =val[j];
                 val[j]=val[j+1];
                 val[j+1]=temp;

@@ -5,6 +5,7 @@ find_package(LAPACKE)
 include_directories (${CMAKE_SOURCE_DIR}/include ${LAPACKE})
 
 
+
 find_package (Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS})
 
@@ -42,3 +43,5 @@ target_link_libraries (tester
                        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 add_test(NAME tester COMMAND tester)
+
+target_link_libraries(tester anpi python2.7 lapack blas)

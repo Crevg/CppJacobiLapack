@@ -77,5 +77,87 @@ int main(int ac, char *av[])
   std::cout << "\n";
   std::cout << "\n";
  
+
+
+  //pruebas para reconstruir A como E*D*Et con jacobi
+ size_t NE=A.rows();
+  anpi::Matrix<float> EJt(NE,NE,anpi::DoNotInitialize);
+  for(int i =0;i<int(NE);i++){
+      for(int j =0;j<int(NE);j++){
+        EJt[j][i]=EJ[i][j];
+      }
+    }
+
+  anpi::Matrix<float> Diag(NE,NE,anpi::DoNotInitialize);//resultant matrix
+
+  for (int i=0;i<int(EJ.rows());++i){
+    for (int j=0;j<int(EJ.cols());++j){
+      if (i==j)
+        Diag[i][j]=valJ[i];
+      else
+        Diag[i][j]=0;
+    }
+  }
+  
+  anpi::Matrix<float> R;
+  R=EJ*Diag*EJt;
+  std::cout << "A ES: " << "\n" << std::endl;
+  printM(A);
+  std::cout << "\n";
+  std::cout << "EJ ES: " << "\n" << std::endl;
+  printM(EJ);
+  std::cout << "\n";
+
+  std::cout << "EJt ES: " << "\n" << std::endl;
+  printM(EJt);
+  std::cout << "\n";
+  
+  std::cout << "Diag ES: " << "\n" << std::endl;
+  printM(Diag);
+  std::cout << "\n";
+  std::cout << "Resultado de EJ*Diag*EJt ES: " << "\n" << std::endl;
+  printM(R);
+  std::cout << "\n";
+
+
+   //pruebas para reconstruir A como E*D*Et con lapack
+  anpi::Matrix<float> ELt(NE,NE,anpi::DoNotInitialize);
+  for(int i =0;i<int(NE);i++){
+      for(int j =0;j<int(NE);j++){
+        ELt[j][i]=EL[i][j];
+      }
+    }
+
+  anpi::Matrix<float> Diag2(NE,NE,anpi::DoNotInitialize);//resultant matrix
+
+  for (int i=0;i<int(EL.rows());++i){
+    for (int j=0;j<int(EL.cols());++j){
+      if (i==j)
+        Diag2[i][j]=valL[i];
+      else
+        Diag2[i][j]=0;
+    }
+  }
+  
+  anpi::Matrix<float> R2;
+  R2=EL*Diag2*ELt;
+  std::cout << "A ES: " << "\n" << std::endl;
+  printM(A);
+  std::cout << "\n";
+  std::cout << "EL ES: " << "\n" << std::endl;
+  printM(EL);
+  std::cout << "\n";
+
+  std::cout << "ELt ES: " << "\n" << std::endl;
+  printM(ELt);
+  std::cout << "\n";
+  
+  std::cout << "Diag ES: " << "\n" << std::endl;
+  printM(Diag);
+  std::cout << "\n";
+  std::cout << "Resultado de EL*Diag2*ELt ES: " << "\n" << std::endl;
+  printM(R2);
+  std::cout << "\n";
+
   return 0;
 }
