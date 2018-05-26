@@ -8,43 +8,17 @@
 
 namespace anpi
 {
-template <typename T>
-std::vector<T> multiByNum (const std::vector<T> v, T num){
-    std::vector <T> res;
-    for (size_t i = 0; i < v.size(); ++i){
-        res.push_back(num * v[i]);
-    }
-    return res;
-}
 
-template <typename T>
-std::vector<T> getCol (const anpi::Matrix<T> &M, size_t n){
-    std::vector<T> v;
-    for (size_t i = 0; i < M.rows(); ++i){
-        v.push_back(M[i][n]);
-    }
-    return v;
-}
-
-template <typename T>
-void printV(const std::vector<T> &v){
-    size_t n= v.size();
-    for (int i = 0; i<n; ++i){
-        std::cout << v[i] << "\t";
-    }
-    std::cout << "\n";
-}
-
-template <typename T>
-void printM(const anpi::Matrix<T> &A){
-    size_t n = A.rows();
-    for (size_t i = 0; i < n; ++i){
-        for (size_t j = 0; j < n; ++j){
-            std::cout << A(i,j) << "\t";
-        }
-        std::cout << std::endl;
-    }
-}
+/***
+ * Verifica que el par ordenado (row, col) no existan respectivamente en
+ * los vectores iVec y jVec y retorna un booleano indicandolo.
+ * @param [in] row numero a verificar en el vector de filas
+ * @param [in] col numero a verificar en el vector de columnas
+ * @param [in] iVec vector de filas
+ * @param [in] jVec vector de columnas
+ * 
+ * @return false si existen como par, true si no
+ * */
 bool notInV(size_t row, size_t col, const std::vector<size_t> &iVec, const std::vector<size_t> &jVec){
     size_t n = iVec.size();
     for (size_t i = 0; i<n; ++i){
@@ -56,6 +30,17 @@ bool notInV(size_t row, size_t col, const std::vector<size_t> &iVec, const std::
     }
     return true;
 }
+
+
+/***
+ * Obtiene el par (fila, columna) que contengan el dato de mayor
+ * valor absoluto afuera de la diagonal
+ * @param [in] A matriz con los valores a verificar
+ * @param [out] rows vector donde se agrega la fila del par ordenado encontrado
+ * @param [out] cols vector donde se agrega la columna del par ordenado encontrado
+ * 
+ * @throws anpi::Exception si la matriz no es cuadrada.
+ * */
 template<typename T>
 void getMax(const anpi::Matrix<T>&A, std::vector<size_t>& rows, 
                             std::vector<size_t> &cols){
@@ -81,6 +66,14 @@ void getMax(const anpi::Matrix<T>&A, std::vector<size_t>& rows,
     cols.push_back(maxJ);
 }
 
+
+/***
+ * Obtiene la matriz de eigenvectores y los eigenvalores de una matriz 
+ * por medio del metodo de transformaciones de Jacobi
+ * @param [in] A matriz con los valores a verificar
+ * @param [out] val vector con los eigenvalores
+ * @param [out] E matriz de eigenvectores (en las columnas)
+ * */
 template<typename T>
 void jacobi(const anpi::Matrix<T>& A, std::vector<T> &val, anpi::Matrix<T> &E){
     /* declara las variables necesarias */
@@ -170,7 +163,6 @@ void jacobi(const anpi::Matrix<T>& A, std::vector<T> &val, anpi::Matrix<T> &E){
     for (size_t i = 0; i < N; ++i){
         val.push_back(Ap(i,i));
     }
-    std::cout << "Sweeps: " << sweeps << std::endl;
 }
 
 }//anpi
