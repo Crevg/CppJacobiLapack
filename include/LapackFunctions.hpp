@@ -17,26 +17,55 @@ namespace anpi
 // pero en este se define como una matriz, y por lo tanto es más fácil manejar 
 //std::ssyev ( const char*, const char*, const int* , const std::vector<T>*, const int*, const std::vector<T>*,  const std::vector<T>*, const int*, const int*);
 
-/* SSYEV prototype */
 
+/**
+   *Declaración de la función ssyev e Lapack para 
+   *calcular los eigenvalores y eigenvectores 
+   *
+   * @param[in] JOBZ = 'N':  calcula solo eigenvalores;
+   *                 = 'V':  calcula eigenvalores y eigenvectores. 
+   * @param[in] IPLO = 'U':  Triangular superior;
+   *                 = 'L':  tringular inferior. 
+   * @param[in] N orden de la matriz 
+   * @param[in,out] A  arreglo real de tamaño (LDA, N)
+   * @param[in] LDA dimensiones del arreglo A.  LDA >= max(1,N). 
+   * @param[out] W un arreglo real, tamaño (N)
+   * @param[out] WORK arreglro real, tamaño (MAX(1,LWORK))
+   * @param[out] LWORK es un int LWORK >= max(1,3*N-1).
+   *             si LWORK = -1, Calcula el valor mas óptimo para WORK
+   * @param[out]INFO es un int
+                = 0:  successful exit   
+                < 0:  if INFO = -i, el i-ésimo argumento tiene un valor no permitido
+                > 0:  if INFO = i, el algoritmo no converge
+   */
 extern "C"
 {
 	extern void ssyev_( char* jobz, char* uplo, int* n, float* a, int* lda,
                 float* w, float* work, int* lwork, int* info );
 }
 
-
+/**
+   *Calculo los eigenvalores y eigenvectores por medio del método de lapack
+   *
+   * @param[in] A matriz cuadrada real 
+   * @param[out] vector con los eigenvalores de A
+   * @param[out] Matriz con los eigenvectores de A
+   */
 template<typename T>
 void eig(const anpi::Matrix<T>& A,
     std::vector<T>& val ,
     anpi::Matrix<T>& E){
 
-    /* Locals */
+    
+    /* Declaraciones */
     int N = A.cols();
     int LDA = N;
     int n = N, lda = LDA, info, lwork;
     float wkopt;
     float* work;
+
+    E = A;
+
 
     //meter la matriz a en un array para lapack
     float a[LDA*N];
@@ -63,7 +92,7 @@ void eig(const anpi::Matrix<T>& A,
         
     //convertir array de lapack a vector de anpi
     for(int i = 0; i < N; ++i){
-        val[i] = w[i];
+        val.push_back(w[i]);
     }
 
     //convertir de nuevo el array de lapack a una matriz de anpi
