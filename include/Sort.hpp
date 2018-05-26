@@ -8,6 +8,14 @@
 namespace anpi
 {
 
+/**
+  *Intercambia las columnas indicadas en los parametros a y b de la 
+  *matriz E elemento por elemento.
+  *@param[in] a primera columna por ser intercambiada
+  *@param[in] b columna para ser intercambiada con a
+  *@param[out] E matriz resultante de intercambiar las columnas
+  */
+
 template<typename T>
 void swapCols(int a,int b,anpi::Matrix<T>& E){
     int i;
@@ -18,6 +26,17 @@ void swapCols(int a,int b,anpi::Matrix<T>& E){
     }
 }
 
+
+
+/**
+  *Reordenar el vector de eigenvalores en orden decreciente. 
+  *Al mismo tiempo realiza intercambios en las columnas de 
+  *la matriz de eigenvectores segun los cambios en el orden
+  *del vector. El ordenamiento del vector se realiza mediante 
+  *bubble sort. Las columnas de la matriz 
+  *@param[out] val vector de eigenvalores
+  *@param[out] E matriz con eigenvectores
+  */
 template<typename T>
 void sort(std::vector<T>&  val, anpi::Matrix<T>& E){
    int i, j;
@@ -32,7 +51,7 @@ void sort(std::vector<T>&  val, anpi::Matrix<T>& E){
                 swapCols(j,j+1,E);
            }
 }//sort
-
+ 
 
 
 }//anpi

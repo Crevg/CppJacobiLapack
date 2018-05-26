@@ -8,7 +8,10 @@
 
 
 
-
+/**
+  *Prueba para comprobar el reordenamiento del vector de eigenvalores
+  *y la matriz de eigenvectores
+  */
 template<typename T>
 void testSort() {
 
