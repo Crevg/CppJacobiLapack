@@ -31,12 +31,16 @@ void eig(const anpi::Matrix<T>& A,
     std::vector<T>& val ,
     anpi::Matrix<T>& E){
 
+    
     /* Locals */
     int N = A.cols();
     int LDA = N;
     int n = N, lda = LDA, info, lwork;
     float wkopt;
     float* work;
+
+    E = A;
+
 
     //meter la matriz a en un array para lapack
     float a[LDA*N];
@@ -63,7 +67,7 @@ void eig(const anpi::Matrix<T>& A,
         
     //convertir array de lapack a vector de anpi
     for(int i = 0; i < N; ++i){
-        val[i] = w[i];
+        val.push_back(w[i]);
     }
 
     //convertir de nuevo el array de lapack a una matriz de anpi

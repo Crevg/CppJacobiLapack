@@ -26,12 +26,12 @@ int main(int ac, char *av[])
     {60, -675, 1620, -1050},
     {-35, 420, -1050, 700}
   };*/
-  std::vector<float> valJ = {0,0,0,0,0,0,0,0,0,0};
-  std::vector<float> valL = {0,0,0,0,0,0,0,0,0,0};
+  std::vector<float> valJ;
+  std::vector<float> valL;
   size_t N = 10;
   std::vector<float> v={1,2,3,4,5,6,7,8,9,10};
-  anpi::Matrix<float> EL(N,N,anpi::DoNotInitialize);
-  anpi::Matrix<float> EJ(N,N,anpi::DoNotInitialize);
+  anpi::Matrix<float> EL;
+  anpi::Matrix<float> EJ;
 
   //matriz random
   A = anpi::randomSymmetricSqr<float>(N);

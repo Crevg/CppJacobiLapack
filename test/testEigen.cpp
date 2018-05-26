@@ -74,13 +74,12 @@ void testJacobi() {
 
 template<typename T>
 void testLapack() {
-	//const T eps = std::numeric_limits<T>::epsilon();
 	const T eps = 0.5;
 	const size_t n=10;
   	anpi::Matrix<T> A,E,D,Et,R;
   	A=anpi::randomSymmetricSqr<T>(n);
-
   	std::vector<T> v;
+
   	anpi::eig(A,v,E);
 
   	Et=transpose(E);
@@ -90,7 +89,7 @@ void testLapack() {
   	for(int i=0;i<int(A.rows());i++){
 		for (int j=0;j<int(A.cols());j++){
 			std::cout<<"Aij2 "<<A[i][j]<<" Rij "<<R[i][j]<<std::endl;
-			BOOST_CHECK( (abs(A[i][j])-abs(R[i][j]))<eps );
+			BOOST_CHECK( (abs(A[i][j])-abs(R[i][j]))<eps);
 		}
 	}
 }	
@@ -98,7 +97,7 @@ void testLapack() {
 
 BOOST_AUTO_TEST_CASE(eigen) {
 	
-	//testLapack<float>();
+	testLapack<float>();
 	testJacobi<float>();
 }
 
